@@ -1,0 +1,1 @@
+# open-nearest-link.vim
