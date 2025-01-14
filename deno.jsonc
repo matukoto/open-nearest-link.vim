@@ -1,7 +1,6 @@
   {
   "version": "2.1.5",
   "compilerOptions": {
-    "allowJs": true,
     "strict": true,
     "lib": ["deno.window"]
   },
