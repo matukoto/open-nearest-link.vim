@@ -1,0 +1,25 @@
+  {
+  "version": "2.1.5",
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": true,
+    "lib": ["deno.window"]
+  },
+  "lint": {
+    "files": {
+      "include": ["denops/"]
+    },
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "include": ["denops/"]
+    },
+    "options": {
+      "lineWidth": 80,
+      "indentWidth": 2
+    }
+  }
+}
