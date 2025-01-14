@@ -1,0 +1,51 @@
+*open-nearest-link.txt*	カーソルに最も近いURLを開くVimプラグイン
+
+Author: matukoto
+License: MIT
+Repository: https://github.com/matukoto/open-nearest-link.vim
+
+==============================================================================
+CONTENTS                                           *open-nearest-link-contents*
+
+Introduction..........................................|open-nearest-link-introduction|
+Requirements.........................................|open-nearest-link-requirements|
+Usage..............................................|open-nearest-link-usage|
+Commands...........................................|open-nearest-link-commands|
+
+==============================================================================
+INTRODUCTION                                     *open-nearest-link-introduction*
+
+このプラグインは、カーソル位置から最も近いURLを検出し、デフォルトのブラウザで
+開くための機能を提供します。
+
+==============================================================================
+REQUIREMENTS                                     *open-nearest-link-requirements*
+
+以下のソフトウェアがインストールされている必要があります：
+
+- Vim 8.1以降 または Neovim
+- denops.vim (https://github.com/vim-denops/denops.vim)
+- Deno (https://deno.land/)
+
+==============================================================================
+USAGE                                           *open-nearest-link-usage*
+
+このプラグインは、テキスト内のURLを検出し、カーソル位置から最も近いURLを
+システムのデフォルトブラウザで開く機能を提供します。
+
+例えば、以下のようなテキストがある場合：
+
+    詳細は https://example.com を参照してください。
+    また、https://example.org も確認してください。
+
+カーソルの位置に応じて、最も近いURLが開かれます。
+
+==============================================================================
+COMMANDS                                        *open-nearest-link-commands*
+
+:OpenNearestLink                               *:OpenNearestLink*
+    カーソル位置から最も近いURLをデフォルトブラウザで開きます。
+    URLが見つからない場合はメッセージを表示します。
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
