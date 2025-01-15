@@ -1,7 +1,6 @@
-import type { Denops } from "jsr:@denops/std@7.4.0";
-import * as fn from "jsr:@denops/std@7.4.0/function";
-import * as helper from "jsr:@denops/std@7.4.0/helper";
-import { isValidUrl } from "jsr:@std/url-util@^0.218.2";
+import { type Denops } from "jsr:@denops/core";
+import * as fn from "jsr:@denops/std/function";
+import * as helper from "jsr:@denops/std/helper";
 
 // URLの正規表現パターン
 const URL_PATTERN = /https?:\/\/[^\s\]()）]*/g;
