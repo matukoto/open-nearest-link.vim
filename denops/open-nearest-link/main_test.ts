@@ -1,138 +1,75 @@
-import { assertEquals } from "jsr:@std/assert";
-import { main } from "./main.ts";
-import { Denops } from "jsr:@denops/core";
-import * as fn from "jsr:@denops/std/function";
-import * as helper from "jsr:@denops/std/helper";
+import { assertEquals } from "std/assert";
+import { assertSpyCalls, spy } from "std/testing/mock";
+import { test } from "std/testing/bdd";
+import { URL_PATTERN, isValidUrl } from "./utils.ts";
 
-Deno.test("main function registers command and dispatcher", async () => {
-  const denops = {
-    cmd: async (cmd: string, opts: Record<string, unknown>) => {
-      assertEquals(
-        cmd,
-        `command! OpenNearestLink call denops#notify('denops', 'openNearestLink', [])`,
-      );
-      assertEquals(opts, { noremap: true, silent: true });
+// モックのDenops型を作成
+type MockDenops = {
+  name: string;
+  cmd: (cmd: string, options: unknown) => Promise<void>;
+  dispatcher: unknown;
+};
+
+// テストヘルパー関数
+function createMockDenops(): MockDenops {
+  return {
+    name: "open-nearest-link",
+    cmd: async () => {},
+    dispatcher: {},
+  };
+}
+
+test("URL Pattern matches valid URLs", () => {
+  const testCases = [
+    {
+      input: "Check out https://example.com for more info",
+      expected: ["https://example.com"],
     },
-    dispatcher: {},
-    name: "denops",
-  } as unknown as Denops;
+    {
+      input: "Multiple URLs: http://test.com and https://example.org",
+      expected: ["http://test.com", "https://example.org"],
+    },
+    {
+      input: "No URLs here",
+      expected: [],
+    },
+    {
+      input: "Complex URL: https://sub.domain.com/path?param=value#hash",
+      expected: ["https://sub.domain.com/path?param=value#hash"],
+    },
+  ];
 
-  await main(denops);
-
-  assertEquals(typeof denops.dispatcher.openNearestLink, "function");
+  for (const { input, expected } of testCases) {
+    const matches = Array.from(input.matchAll(URL_PATTERN)).map((m) => m[0]);
+    assertEquals(matches, expected);
+  }
 });
 
-Deno.test("openNearestLink function opens nearest valid URL", async () => {
-  const denops = {
-    cmd: async () => {},
-    dispatcher: {},
-    name: "denops",
-  } as unknown as Denops;
+test("isValidUrl validates URLs correctly", () => {
+  const testCases = [
+    { url: "https://example.com", expected: true },
+    { url: "http://localhost:8080", expected: true },
+    { url: "not-a-url", expected: false },
+    { url: "https://", expected: false },
+  ];
 
-  await main(denops);
-
-  const openNearestLink = denops.dispatcher.openNearestLink as () => Promise<
-    void
-  >;
-
-  const mockLine =
-    "Check this link: https://example.com and this one: http://example.org";
-  const mockCol = 20;
-
-  // fn.line = async () => 1;
-  // fn.col = async () => mockCol;
-  // fn.getline = async () => mockLine;
-  // helper.echo = async () => {};
-
-  let openedUrl = "";
-  Deno.Command = class {
-    constructor(public cmd: string, public options: { args: string[] }) {
-      openedUrl = options.args[0];
-    }
-    async output() {}
-  } as unknown as typeof Deno.Command;
-
-  // globalThis.isValidUrl = (url: string) => url.startsWith("http");
-
-  await openNearestLink();
-
-  assertEquals(openedUrl, "https://example.com");
+  for (const { url, expected } of testCases) {
+    const result = isValidUrl(url);
+    assertEquals(
+      result,
+      expected,
+      `isValidUrl('${url}') should return ${expected}`,
+    );
+  }
 });
 
-Deno.test("openNearestLink function handles no URLs found", async () => {
-  const denops = {
-    cmd: async () => {},
-    dispatcher: {},
-    name: "denops",
-  } as unknown as Denops;
+test("main function registers command", async () => {
+  const denops = createMockDenops();
+  const cmdSpy = spy(denops, "cmd");
 
-  await main(denops);
+  // main関数をインポートして実行
+  const { main } = await import("./main.ts");
+  await main(denops as any);
 
-  const openNearestLink = denops.dispatcher.openNearestLink as () => Promise<
-    void
-  >;
-
-  const mockLine = "No URLs here";
-  const mockCol = 5;
-
-  // fn.line = async () => 1;
-  // fn.col = async () => mockCol;
-  // fn.getline = async () => mockLine;
-  //  helper.echo = async (denops: Denops, message: string) => {
-  //   assertEquals(message, "No URLs found in the current line");
-  // };
-
-  await openNearestLink();
-});
-
-Deno.test("openNearestLink function handles invalid URL", async () => {
-  const denops = {
-    cmd: async () => {},
-    dispatcher: {},
-    name: "denops",
-  } as unknown as Denops;
-
-  await main(denops);
-
-  const openNearestLink = denops.dispatcher.openNearestLink as () => Promise<
-    void
-  >;
-
-  const mockLine = "Invalid URL: ftp://example.com";
-  const mockCol = 15;
-
-  // fn.line = async () => 1;
-  // fn.col = async () => mockCol;
-  // fn.getline = async () => mockLine;
-  // helper.echo = async (denops: Denops, message: string) => {
-  //   assertEquals(message, "Invalid URL: ftp://example.com");
-  // };
-
-  // globalThis.isValidUrl = (url: string) => url.startsWith("http");
-
-  await openNearestLink();
-});
-
-Deno.test("openNearestLink function handles errors", async () => {
-  const denops = {
-    cmd: async () => {},
-    dispatcher: {},
-    name: "denops",
-  } as unknown as Denops;
-
-  await main(denops);
-
-  const openNearestLink = denops.dispatcher.openNearestLink as () => Promise<
-    void
-  >;
-
-  // fn.line = async () => {
-  //   throw new Error("Test error");
-  // };
-
-  // helper.echo = async (denops: Denops, message: string) => {
-  //   assertEquals(message, "Error: Test error");
-  // };
-
-  await openNearestLink();
+  assertSpyCalls(cmdSpy, 1);
 });

@@ -2,8 +2,7 @@ import { type Denops } from "jsr:@denops/core";
 import * as fn from "jsr:@denops/std/function";
 import * as helper from "jsr:@denops/std/helper";
 
-// URLの正規表現パターン
-const URL_PATTERN = /https?:\/\/[^\s\]()）]*/g;
+import { URL_PATTERN, isValidUrl } from "./utils.ts";
 
 interface UrlMatch extends RegExpMatchArray {
   index: number;
