@@ -1,24 +1,33 @@
 {
   "version": "2.1.5",
+  "tasks": {
+    "test": "deno test -A"
+  },
+  "imports": {
+  },
   "compilerOptions": {
     "strict": true,
-    "lib": ["deno.window"]
+    "lib": ["deno.window", "deno.ns"],
+    "types": ["https://deno.land/x/denops_core@v5.0.0/mod.ts"]
   },
   "lint": {
-    "files": {
-      "include": ["denops/"]
-    },
+    "include": ["denops/"],
     "rules": {
-      "tags": ["recommended"]
+      "tags": ["recommended"],
+      "include": [
+        "explicit-function-return-type",
+        "no-explicit-any",
+        "no-empty",
+        "ban-untagged-todo",
+        "no-unused-vars"
+      ]
     }
   },
   "fmt": {
-    "files": {
-      "include": ["denops/"]
-    },
-    "options": {
-      "lineWidth": 80,
-      "indentWidth": 2
-    }
+    "include": ["denops/"],
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "proseWrap": "preserve"
   }
 }
