@@ -25,6 +25,7 @@ This plugin provides commands to find and open the nearest link in your text.
 ## Development
 
 ### Testing
+
 ```bash
 deno task test   # Run all tests
 deno task check  # Type check
