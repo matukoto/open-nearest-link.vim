@@ -1,7 +1,7 @@
 import { assertEquals } from "std/assert";
 import { assertSpyCalls, spy } from "std/testing/mock";
 import { test } from "std/testing/bdd";
-import { URL_PATTERN, isValidUrl } from "./utils.ts";
+import { isValidUrl, URL_PATTERN } from "./utils.ts";
 
 // モックのDenops型を作成
 type MockDenops = {

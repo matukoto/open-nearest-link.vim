@@ -2,7 +2,7 @@ import { type Denops } from "jsr:@denops/core";
 import * as fn from "jsr:@denops/std/function";
 import * as helper from "jsr:@denops/std/helper";
 
-import { URL_PATTERN, isValidUrl } from "./utils.ts";
+import { isValidUrl, URL_PATTERN } from "./utils.ts";
 
 interface UrlMatch extends RegExpMatchArray {
   index: number;
