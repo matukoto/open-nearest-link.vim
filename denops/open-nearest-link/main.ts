@@ -1,9 +1,8 @@
-import { type Denops } from "jsr:@denops/core";
-import * as fn from "jsr:@denops/std/function";
-import * as helper from "jsr:@denops/std/helper";
+import type { Denops } from 'jsr:@denops/core';
+import * as fn from 'jsr:@denops/std/function';
+import * as helper from 'jsr:@denops/std/helper';
 
-// URLの正規表現パターン
-const URL_PATTERN = /https?:\/\/[^\s\]()）]*/g;
+import { isValidUrl, URL_PATTERN } from './utils.ts';
 
 interface UrlMatch extends RegExpMatchArray {
   index: number;
@@ -21,20 +20,20 @@ export async function main(denops: Denops): Promise<void> {
     async openNearestLink(): Promise<void> {
       try {
         // 現在のカーソル位置を取得
-        const [line, col] = await Promise.all([
-          fn.line(".", denops),
-          fn.col(".", denops),
+        const [_line, col] = await Promise.all([
+          fn.line('.', denops),
+          fn.col('.', denops),
         ]);
 
         // 現在の行の内容を取得
-        const currentLine = await fn.getline(".", denops);
+        const currentLine = await fn.getline('.', denops);
 
         // URLを検索
         const urls = Array.from(
           currentLine.matchAll(URL_PATTERN),
         ) as UrlMatch[];
         if (urls.length === 0) {
-          await helper.echo(denops, "No URLs found in the current line");
+          await helper.echo(denops, 'No URLs found in the current line');
           return;
         }
 
@@ -56,12 +55,12 @@ export async function main(denops: Denops): Promise<void> {
           await helper.echo(denops, `Invalid URL: ${url}`);
           return;
         }
-        if (Deno.build.os === "windows") {
-          await new Deno.Command("cmd", {
-            args: ["/c", "start", url],
+        if (Deno.build.os === 'windows') {
+          await new Deno.Command('cmd', {
+            args: ['/c', 'start', url],
           }).output();
         } else {
-          await new Deno.Command("open", {
+          await new Deno.Command('open', {
             args: [url],
           }).output();
         }
