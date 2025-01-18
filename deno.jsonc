@@ -3,7 +3,9 @@
   "tasks": {
     "test": "deno test -A"
   },
-  "imports": {},
+  "imports": {
+    "@denops/std": "jsr:@denops/std@^7.4.0"
+  },
   "compilerOptions": {
     // 型チェックを厳密に
     "strict": true,
