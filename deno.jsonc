@@ -3,12 +3,14 @@
   "tasks": {
     "test": "deno test -A"
   },
-  "imports": {
-  },
+  "imports": {},
   "compilerOptions": {
+    // 型チェックを厳密に
     "strict": true,
-    "lib": ["deno.window", "deno.ns"],
-    "types": ["https://deno.land/x/denops_core@v5.0.0/mod.ts"]
+    // denops 関連の Deno API (dom, deno.ns など) を使えるように
+    // ns = node_shims
+    // window デフォルトのやつ
+    "lib": ["deno.window", "deno.ns"]
   },
   "lint": {
     "include": ["denops/"],
