@@ -21,12 +21,12 @@ export async function main(denops: Denops): Promise<void> {
       try {
         // 現在のカーソル位置を取得
         const [_line, col] = await Promise.all([
-          fn.line('.', denops),
-          fn.col('.', denops),
+          fn.line(denops, '.'),
+          fn.col(denops, '.'),
         ]);
 
         // 現在の行の内容を取得
-        const currentLine = await fn.getline('.', denops);
+        const currentLine = await fn.getline(denops, '.');
 
         // URLを検索
         const urls = Array.from(
@@ -66,7 +66,11 @@ export async function main(denops: Denops): Promise<void> {
         }
       } catch (error) {
         console.error(error);
-        await helper.echo(denops, `Error: ${error.message}`);
+        if (error instanceof Error) {
+          await helper.echo(denops, `Error: ${error.message}`);
+        } else {
+          await helper.echo(denops, `An unknown error occurred`);
+        }
       }
     },
   };
