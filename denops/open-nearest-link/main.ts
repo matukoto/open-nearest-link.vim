@@ -19,38 +19,56 @@ export async function main(denops: Denops): Promise<void> {
   denops.dispatcher = {
     async openNearestLink(): Promise<void> {
       try {
-        // 現在のカーソル位置を取得
-        const [_line, col] = await Promise.all([
+        // カーソル位置を取得
+        const [currentLine, currentCol] = await Promise.all([
           fn.line(denops, '.'),
           fn.col(denops, '.'),
         ]);
 
-        // 現在の行の内容を取得
-        const currentLine = await fn.getline(denops, '.');
-
-        // URLを検索
-        const urls = Array.from(
-          currentLine.matchAll(URL_PATTERN),
-        ) as UrlMatch[];
-        if (urls.length === 0) {
-          await helper.echo(denops, 'No URLs found in the current line');
-          return;
-        }
-
-        // カーソルに最も近いURLを見つける
-        let nearestUrl = urls[0];
-        let minDistance = Math.abs(nearestUrl.index - col);
-
-        for (const match of urls) {
-          const distance = Math.abs(match.index - col);
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestUrl = match;
+        // バッファの全行数を取得
+        const lastLine = await fn.line(denops, '$');
+        
+        // バッファ内の全てのURLを収集
+        const urlMatches: Array<{url: string; line: number; col: number}> = [];
+        
+        for (let lineNum = 1; lineNum <= lastLine; lineNum++) {
+          const lineContent = await fn.getline(denops, lineNum);
+          const matches = Array.from(lineContent.matchAll(URL_PATTERN)) as UrlMatch[];
+          
+          for (const match of matches) {
+            urlMatches.push({
+              url: match[0],
+              line: lineNum,
+              col: match.index,
+            });
           }
         }
 
+        if (urlMatches.length === 0) {
+          await helper.echo(denops, 'No URLs found in the buffer');
+          return;
+        }
+
+        // カーソルからの距離を計算し、距離でソート
+        const distances = urlMatches.map(match => ({
+          ...match,
+          distance: Math.sqrt(
+            Math.pow(match.line - currentLine, 2) +
+            Math.pow(match.col - currentCol, 2)
+          ),
+          belowCursor: match.line >= currentLine
+        })).sort((a, b) => a.distance - b.distance);
+
+        // 最小距離を持つURLを見つける
+        const minDistance = distances[0].distance;
+        const nearestUrls = distances.filter(d => Math.abs(d.distance - minDistance) < 0.0001);
+
+        // 同じ距離のURLが複数ある場合、カーソル行以下のものを優先
+        const belowUrls = nearestUrls.filter(u => u.belowCursor);
+        const selectedUrl = belowUrls.length > 0 ? belowUrls[0] : nearestUrls[0];
+
         // URLの検証
-        const url = nearestUrl[0];
+        const url = selectedUrl.url;
         if (!isValidUrl(url)) {
           await helper.echo(denops, `Invalid URL: ${url}`);
           return;
